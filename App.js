@@ -1,12 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TextInput, Image } from 'react-native';
+import Button from './components/Button';
+import Input from './components/Input';
 
 export default function App() {
   return (
     <View style={styles.container}>
       
       <Image source={require('./assets/logo.png')} style={styles.logo} />
-      
+
       <TextInput 
         style={styles.input} 
         placeholder="Email" 
@@ -21,9 +23,8 @@ export default function App() {
         secureTextEntry={true} 
       />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+      <Button text="Login"/>
+      <Input text="Notes"/>
 
       <StatusBar style="auto" hidden />
     </View>
