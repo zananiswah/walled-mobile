@@ -1,15 +1,55 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput } from "react-native";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
-function Transfer() {
+import Amount from "../../components/Amount";
+
+export default function Transfer() {
   return (
-    <View>
-      <Text>Ini halaman transfer</Text>
-      <Input text="Amount" />
-      <Input text="Notes" />
-      <Button text="Transfer"/>
-    </View>
+    <>
+      <ScrollView style={{ flex: 1, backgroundColor: "#ffff" }}>
+        <View
+          style={{
+            backgroundColor: "#19918F",
+            paddingHorizontal: 20,
+            paddingVertical: 8,
+            width: "100%",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: "#fff", fontSize: 18 }}>To:</Text>
+          <TextInput
+            style={{ fontSize: 18 }}
+            keyboardType="number-pad"
+            placeholder="insert account number"
+            placeholderTextColor={"#fff"}
+            color={"#fff"}
+          />
+        </View>
+        <View style={styles.container}>
+          <Amount marginBottom={24} />
+          <Input text={"Notes"} />
+        </View>
+      </ScrollView>
+      <View>
+        <Button text={"Transfer"} style={styles.button} />
+      </View>
+    </>
   );
 }
 
-export default Transfer;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  button: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: 20,
+  },
+});

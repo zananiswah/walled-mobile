@@ -34,11 +34,21 @@ export default function App() {
         placeholderTextColor="#aaa"
         secureTextEntry={false}
       />
-
+      <Text style={styles.text2}>
+        I have read and agree to the
+        <Link style={styles.link} href="/termscondition">
+          {" "}
+          Terms and Conditions
+          <Text style={styles.red}> *</Text>
+        </Link>
+      </Text>
       <Button text="Login" />
-      {/* <Input text="Notes" /> */}
-        <Text style={styles.text}>Have account?
-        <Link style={styles.link} href="/"> Login here.</Link>
+      <Text style={styles.text}>
+        Have account?
+        <Link style={styles.link} href="/">
+          {" "}
+          Login here.
+        </Link>
       </Text>
       <StatusBar style="auto" hidden />
     </View>
@@ -52,7 +62,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    
   },
   logo: {
     // width: 100,
@@ -88,12 +97,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  link:{
-    color:"#19918F",
-    padding: 20
+  link: {
+    color: "#19918F",
+    padding: 20,
   },
-  text:{
+  text: {
     width: "100%",
     alignItems: "left",
-  }
+  },
+  text2: {
+    width: "100%",
+    alignItems: "left",
+    marginBottom: 15,
+    paddingHorizontal: 30
+  },
+  red: {
+    color: "#ff0000",
+  },
 });
