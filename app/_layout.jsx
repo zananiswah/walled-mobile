@@ -7,7 +7,7 @@ export default function Layout() {
       <Stack.Screen name="(home)" options={{headerShown: false}} />
       <Stack.Screen name="index" options={{headerShown: false}} />
       <Stack.Screen name="register" options={{headerShown: false}} />
-      <Stack.Screen name="termscondition" options={{title: 'Terms and Condition'}} />
+      <Stack.Screen name="termscondition" options={{presentation: 'modal', title: 'Terms and Condition'}} />
     </Stack>
   );
 }

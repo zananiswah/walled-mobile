@@ -3,8 +3,41 @@ import { StyleSheet, View, TextInput, Image, Text } from "react-native";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import { Link } from "expo-router";
+import { z } from "zod";
+import { useState } from "react";
+
+const LoginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Must be 8 or more characters" }),
+});
 
 export default function App() {
+  const [form, setForm] = useState({});
+  const [errorMsg, setErrors] = useState({});
+
+  const handleInputChange = (key, value) => {
+    setForm({ ...form, [key]: value });
+    try {
+      LoginSchema.pick({ [key]: true }).parse({ [key]: value });
+      setErrors((prev) => ({ ...prev, [key]: "" })); 
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, [key]: err.errors[0].message })); 
+    }
+  };
+  
+  const handleSubmit = () => {
+    try {
+      LoginSchema.parse(form);
+    } catch (err) {
+      const errors = {};
+      err.errors.forEach((item) => {
+        const key = item.path[0];
+        errors[key] = item.message;
+      });
+      setErrors(errors);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image source={require("../assets/logo.png")} style={styles.logo} />
@@ -14,21 +47,29 @@ export default function App() {
         placeholder="Email"
         placeholderTextColor="#aaa"
         keyboardType="email-address"
+        onChangeText={(text) => handleInputChange("email", text)}
+        value={form.email}
       />
+      {errorMsg.email ? <Text style={styles.errorMessage}>{errorMsg.email}</Text> : null}
 
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#aaa"
         secureTextEntry={true}
+        onChangeText={(text) => handleInputChange("password", text)}
+        value={form.password}
       />
+      {errorMsg.password ?  <Text style={styles.errorMessage}>{errorMsg.password}</Text>: null}
 
-      <Link href="/(home)">
-        Ke Home
-      </Link>
-      <Button text="Login" />
-      <Text style={styles.text}>Don't have account?
-        <Link style={styles.link} href="register" > Register here.</Link>
+      <Link href="/(home)">Ke Home</Link>
+      <Button handlePress={handleSubmit} text="Login" />
+      <Text style={styles.text}>
+        Don't have account?
+        <Link style={styles.link} href="register">
+          {" "}
+          Register here.
+        </Link>
       </Text>
       <StatusBar style="auto" hidden />
     </View>
@@ -58,9 +99,9 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 15,
+    borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 15,
+    marginTop: 15,
     backgroundColor: "#f9f9f9",
     fontSize: 16,
   },
@@ -77,13 +118,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  link:{
-    color:"#19918F",
+  link: {
+    color: "#19918F",
     width: "100%",
-    alignItems: "left"
+    alignItems: "left",
   },
-  text:{
+  text: {
     width: "100%",
-    alignItems: "left"
+    alignItems: "left",
+  },
+  errorMessage:{
+    color: "#ff0000"
   }
 });

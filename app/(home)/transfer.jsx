@@ -17,9 +17,9 @@ export default function Transfer() {
             alignItems: "center",
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 18 }}>To:</Text>
+          <Text style={{ color: "#fff", fontSize: 16 }}>To:</Text>
           <TextInput
-            style={{ fontSize: 18 }}
+            style={{ fontSize: 16 }}
             keyboardType="number-pad"
             placeholder="insert account number"
             placeholderTextColor={"#fff"}
