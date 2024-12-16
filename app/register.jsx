@@ -127,12 +127,12 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "left",
     marginLeft: 10,
-    fontSize: 16,
     fontFamily: "Opensans",
     padding: 12,
   },
   text2: {
     alignItems: "left",
+    marginLeft: 10,
   },
   text3: {
     width: "100%",

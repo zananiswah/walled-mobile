@@ -1,8 +1,10 @@
 import { Link, Stack } from 'expo-router';
 import { Image, Text, View, StyleSheet, ScrollView, TouchableOpacity   } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 function LogoTitle() {
   return (
@@ -12,13 +14,39 @@ function LogoTitle() {
 
 export default function Home() {
   const [showBalance, setShowBalance] = useState([true]);
+  const [user, setUser] = useState({})
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("token");
+        if (value !== null) {
+          const res = await axios.get(
+            "https://6776-182-3-53-7.ngrok-free.app/profile",
+            {
+              headers: {
+                Authorization: `Bearer ${value}`,
+              },
+            }
+          );
+          const user = res.data.data
+          setUser(user)
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    getData();
+  }, []);
   return (
     <ScrollView containerStyle={styles.container}>
       <View style={styles.header}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Image source={require('../../assets/avatar.png')} style={{ width: 50, height: 50, borderRadius: 100}} />
+          {/* <Image source={require('../../assets/avatar.png')} style={{ width: 50, height: 50, borderRadius: 100}} /> */}
+          {user?.avatar_url && (<Image source={{ uri: user.avatar_url }} style={{ width: 50, height: 50, borderRadius: 25 }}/>
+)}
+
           <View>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{user.fullname}</Text>
+            {user?.fullname && <Text>{user.fullname}</Text>}
             <Text style={{ fontSize: 18 }}>{user.typeofaccount}</Text>
           </View>
         </View>
@@ -27,7 +55,7 @@ export default function Home() {
       <View style={{ backgroundColor: '#FAFBFD', paddingHorizontal: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 25, justifyContent: 'space-between' }}>
           <View style={{ width: '70%' }}>
-            <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 8 }}>Good Morning, {user.fullname.split(' ')[0]}</Text>
+            {user?.fullname && <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Good Morning, {user.fullname}</Text>}
             <Text style={{ fontSize: 18 }}>Check all your incoming and outgoing transactions here</Text>
           </View>
           <Image source={require('../../assets/Sun.png')} style={{ width: 81, height: 77 }} />
@@ -35,13 +63,14 @@ export default function Home() {
 
         <View style={styles.accountnumber}>
           <Text style={{ color: '#fff', fontSize: 18 }}>Account No.</Text>
-          <Text style={{ fontWeight: 'bold', color: '#fff', fontSize: 18 }}>{user.accountnumber}</Text>
+          {user?.id && <Text style={{ fontWeight: 'bold', color: '#fff', fontSize: 18}}>90013{user.id}</Text>}
         </View>
 
         <View style={styles.balancebox}>
           <View>
             <Text style={{ fontSize: 20 }}>Balance</Text>
-            <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Rp {user.balance}</Text>
+            {user?.balance && <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Rp{user.balance}</Text>}
+          
           </View>
           <View>
             <View style={{ gap: 20 }}>

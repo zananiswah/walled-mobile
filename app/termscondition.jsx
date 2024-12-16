@@ -126,7 +126,8 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 16,
     fontFamily: "Opensans",
-    padding: 12,
+    padding: 10,
+    textAlign: "justify"
   },
   text2: {
     alignItems: "left",
