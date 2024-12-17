@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -13,19 +14,9 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-// function LogoTitle() {
-//   return (
-//     <Image style={styles.image} source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }} />
-//     // <Image style={styles.image} source={{ uri: {user.avatar_url} }} />
-//     // {user?.avatar_url && (
-//     //   <Image
-//     //     source={{ uri: user.avatar_url }}
-//     //     style={{ width: 50, height: 50, borderRadius: 25 }}
-//     //   />
-//     )}
-
 function LogoTitle({ avatar }) {
   const [isAvatarActive, setIsAvatarActive] = useState(true);
+
   return (
     <TouchableOpacity
       style={[
@@ -43,6 +34,7 @@ function LogoTitle({ avatar }) {
 export default function Home() {
   const [showBalance, setShowBalance] = useState([true]);
   const [user, setUser] = useState({});
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -62,142 +54,152 @@ export default function Home() {
     };
     getData();
   }, []);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
-      <ScrollView containerStyle={styles.container}>
-        <View style={styles.header}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <LogoTitle avatar={user?.avatar_url} />
-
-            <View>
-              {user?.fullname && (
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                  {user.fullname}
-                </Text>
-              )}
-              <Text style={{ fontSize: 18 }}>Personal Account</Text>
-            </View>
-          </View>
-          <Image source={require("../../assets/suntoggle.png")} />
-        </View>
-        <View style={{ backgroundColor: "#FAFBFD", paddingHorizontal: 20 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingTop: 25,
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={{ width: "70%" }}>
-              {user?.fullname && (
-                <Text style={{ fontSize: 22, fontWeight: "bold" }}>
-                  Good Morning, {user?.fullname}
-                </Text>
-              )}
-              <Text style={{ fontSize: 18 }}>
-                Check all your incoming and outgoing transactions here
-              </Text>
-            </View>
-            <Image
-              source={require("../../assets/Sun.png")}
-              style={{ width: 81, height: 77 }}
-            />
-          </View>
-
-          <View style={styles.accountnumber}>
-            <Text style={{ color: "#fff", fontSize: 18 }}>Account No.</Text>
-            {user?.id && (
-              <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
-                {user?.wallet.account_number}
+    <ScrollView contentContainerStyle={styles.scrollView}
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    } containerStyle={styles.container}>
+      <View style={styles.header}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <LogoTitle avatar={user?.avatar_url} />
+          <View>
+            {user?.fullname && (
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                {user.fullname}
               </Text>
             )}
+            <Text style={{ fontSize: 18 }}>Personal Account</Text>
           </View>
-
-          <View style={styles.balancebox}>
-            <View>
-              <Text style={{ fontSize: 20 }}>Balance</Text>
-              {user?.wallet.balance && <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Rp{user?.wallet.balance}</Text>}
-            </View>
-            <View>
-              <View style={{ gap: 20 }}>
-                <TouchableOpacity
-                  style={{
-                    width: 40,
-                    height: 40,
-                    backgroundColor: "#19918F",
-                    borderRadius: 10,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <FontAwesome6 size={18} name="add" color={"#fff"} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    width: 40,
-                    height: 40,
-                    backgroundColor: "#19918F",
-                    borderRadius: 10,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <FontAwesome size={18} name="send" color={"#fff"} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <ScrollView
-            style={{
-              flex: 1,
-              backgroundColor: "#fff",
-              marginTop: 40,
-              borderRadius: 10,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                padding: 20,
-                borderBottomColor: "#b3b3b3",
-                borderBottomWidth: 0.5,
-              }}
-            >
-              Transaction History
+        </View>
+        <Image source={require("../../assets/suntoggle.png")} />
+      </View>
+      <View style={{ backgroundColor: "#FAFBFD", paddingHorizontal: 20 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingTop: 25,
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ width: "70%" }}>
+            {user?.fullname && (
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+                Good Morning, {user?.fullname}
+              </Text>
+            )}
+            <Text style={{ fontSize: 18 }}>
+              Check all your incoming and outgoing transactions here
             </Text>
-            {transactions.map((transaction) => (
-              <View
-                key={transaction.id}
+          </View>
+          <Image
+            source={require("../../assets/Sun.png")}
+            style={{ width: 81, height: 77 }}
+          />
+        </View>
+
+        <View style={styles.accountnumber}>
+          <Text style={{ color: "#fff", fontSize: 18 }}>Account No.</Text>
+          {user?.id && (
+            <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
+              {user?.wallet.account_number}
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.balancebox}>
+          <View>
+            <Text style={{ fontSize: 20 }}>Balance</Text>
+            {user?.wallet.balance && <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Rp{user?.wallet.balance}</Text>}
+          </View>
+          <View>
+            <View style={{ gap: 20 }}>
+              <TouchableOpacity
                 style={{
-                  flexDirection: "row",
+                  width: 40,
+                  height: 40,
+                  backgroundColor: "#19918F",
+                  borderRadius: 10,
                   alignItems: "center",
-                  justifyContent: "space-between",
-                  paddingHorizontal: 20,
-                  paddingVertical: 15,
+                  justifyContent: "center",
                 }}
               >
-                <View>
-                  <Text style={{ fontSize: 18 }}>{transaction.name}</Text>
-                  <Text style={{ fontSize: 16 }}>{transaction.type}</Text>
-                  <Text style={{ fontSize: 14, color: "#b3b3b3" }}>
-                    {transaction.date}
-                  </Text>
-                </View>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    color: transaction.debit ? "red" : "green",
-                  }}
-                >
-                  {transaction.debit ? "-" : "+"} Rp {transaction.amount}
+                <FontAwesome6 size={18} name="add" color={"#fff"} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  width: 40,
+                  height: 40,
+                  backgroundColor: "#19918F",
+                  borderRadius: 10,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FontAwesome size={18} name="send" color={"#fff"} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <ScrollView
+          style={{
+            flex: 1,
+            backgroundColor: "#fff",
+            marginTop: 40,
+            borderRadius: 10,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              padding: 20,
+              borderBottomColor: "#b3b3b3",
+              borderBottomWidth: 0.5,
+            }}
+          >
+            Transaction History
+          </Text>
+          {transactions.map((transaction) => (
+            <View
+              key={transaction.id}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 20,
+                paddingVertical: 15,
+              }}
+            >
+              <View>
+                <Text style={{ fontSize: 18 }}>{transaction.name}</Text>
+                <Text style={{ fontSize: 16 }}>{transaction.type}</Text>
+                <Text style={{ fontSize: 14, color: "#b3b3b3" }}>
+                  {transaction.date}
                 </Text>
               </View>
-            ))}
-          </ScrollView>
-        </View>
-      </ScrollView>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: transaction.debit ? "red" : "green",
+                }}
+              >
+                {transaction.debit ? "-" : "+"} Rp {transaction.amount}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+    </ScrollView>
   );
 }
 
