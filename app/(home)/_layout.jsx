@@ -11,7 +11,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Home', headerShown: false,
           tabBarIcon: ({ color }) => <Entypo size={28} name="home" color={color} />,
         }}
       />

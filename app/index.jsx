@@ -5,7 +5,7 @@ import { Link, useNavigation, useRouter } from "expo-router";
 import { z } from "zod";
 import { useState } from "react";
 import axios from "axios";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginSchema = z.object({
   email: z.string().email({ message: "invalid email address" }),
@@ -33,11 +33,11 @@ export default function App() {
       LoginSchema.parse(form);
 
       const res = await axios.post(
-        "https://6776-182-3-53-7.ngrok-free.app/auth/login",
+        "https://walled-api.vercel.app/auth/login",
         form
       );
       await AsyncStorage.setItem("token", res.data.data.token);
-      router.replace("/(home)")
+      router.replace("/(home)");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         if (err.response) {
