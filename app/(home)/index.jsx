@@ -32,9 +32,10 @@ function LogoTitle({ avatar }) {
 }
 
 export default function Home() {
-  const [showBalance, setShowBalance] = useState([true]);
+  const [showBalance, setShowBalance] = useState(true);
   const [user, setUser] = useState({});
-
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [transaction, setTransaction] = useState([]);
   useEffect(() => {
     const getData = async () => {
       try {
@@ -53,8 +54,29 @@ export default function Home() {
       }
     };
     getData();
-  }, []);
-  const [refreshing, setRefreshing] = React.useState(false);
+  }, [refreshing]);
+  useEffect(() => {
+    const getTransaction = async () => {
+      try {
+        const value = await AsyncStorage.getItem("token");
+        if (value !== null) {
+          const res = await axios.get(
+            "https://walled-api.vercel.app/transactions",
+            {
+              headers: {
+                Authorization: `Bearer ${value}`,
+              },
+            }
+          );
+          const transaction = res.data.data;
+          setTransaction(transaction);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    getTransaction();
+  }, [refreshing]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -63,10 +85,13 @@ export default function Home() {
     }, 2000);
   }, []);
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}
-    refreshControl={
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-    } containerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      containerStyle={styles.container}
+    >
       <View style={styles.header}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <LogoTitle avatar={user?.avatar_url} />
@@ -117,9 +142,24 @@ export default function Home() {
 
         <View style={styles.balancebox}>
           <View>
-            <Text style={{ fontSize: 20 }}>Balance</Text>
-            {user?.wallet.balance && <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Rp{user?.wallet.balance}</Text>}
+            <Text style={{ color: "black", fontSize: 18 }}>Balance</Text>
+            <View style={{ gap: 2 }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+                {showBalance
+                  ? `Rp${user.wallet?.balance.toLocaleString("id-ID")}`
+                  : "Rp ****"}
+                <TouchableOpacity
+                  onPress={() => setShowBalance((prev) => !prev)}
+                >
+                  <Image
+                    source={require("../../assets/view.png")}
+                    style={{ width: 18, height: 18, marginLeft: 10 }}
+                  />
+                </TouchableOpacity>
+              </Text>
+            </View>
           </View>
+
           <View>
             <View style={{ gap: 20 }}>
               <TouchableOpacity
@@ -169,9 +209,9 @@ export default function Home() {
           >
             Transaction History
           </Text>
-          {transactions.map((transaction) => (
+          {transaction?.map((tx) => (
             <View
-              key={transaction.id}
+              key={transaction?.id}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -181,19 +221,22 @@ export default function Home() {
               }}
             >
               <View>
-                <Text style={{ fontSize: 18 }}>{transaction.name}</Text>
-                <Text style={{ fontSize: 16 }}>{transaction.type}</Text>
+                <Text style={{ fontSize: 19 }}>{user?.fullname}</Text>
+                <Text style={{ fontSize: 16 }}>{tx?.transaction_type}</Text>
                 <Text style={{ fontSize: 14, color: "#b3b3b3" }}>
-                  {transaction.date}
+                  {tx?.transaction_date}
                 </Text>
               </View>
-              <Text
+              {/* <Text
                 style={{
                   fontSize: 18,
-                  color: transaction.debit ? "red" : "green",
+                  color: tx?.transaction_type === "transfer" ? "red" : "green",
                 }}
               >
-                {transaction.debit ? "-" : "+"} Rp {transaction.amount}
+                {tx?.transaction_type === "transfer" ? "-" : "+"} Rp {tx.amount}
+              </Text> */}
+              <Text style={{fontSize: 18, color:tx?.transaction_type === "transfer" && tx.amount > 0 ? "green" : "red",}}>
+                {tx?.transaction_type === "transfer" && tx.amount > 0 ? `+ Rp ${tx.amount}` : `- Rp ${tx.amount}`}
               </Text>
             </View>
           ))}
@@ -210,40 +253,40 @@ const user = {
   balance: "10.000.000",
 };
 
-const transactions = [
-  {
-    id: 1,
-    date: "08 December 2024",
-    amount: "75.000",
-    name: "Flazz",
-    type: "Topup",
-    debit: false,
-  },
-  {
-    id: 2,
-    date: "06 December 2024",
-    amount: "80.000",
-    name: "Aisyah",
-    type: "Transfer",
-    debit: true,
-  },
-  {
-    id: 3,
-    date: "04 December 2024",
-    amount: "175.000",
-    name: "Baetris",
-    type: "Transfer",
-    debit: true,
-  },
-  {
-    id: 4,
-    date: "02 December 2024",
-    amount: "55.000",
-    name: "Isna",
-    type: "Transfer",
-    debit: false,
-  },
-];
+// const transactions = [
+//   {
+//     id: 1,
+//     date: "08 December 2024",
+//     amount: "75.000",
+//     name: "Flazz",
+//     type: "Topup",
+//     debit: false,
+//   },
+//   {
+//     id: 2,
+//     date: "06 December 2024",
+//     amount: "80.000",
+//     name: "Aisyah",
+//     type: "Transfer",
+//     debit: true,
+//   },
+//   {
+//     id: 3,
+//     date: "04 December 2024",
+//     amount: "175.000",
+//     name: "Baetris",
+//     type: "Transfer",
+//     debit: true,
+//   },
+//   {
+//     id: 4,
+//     date: "02 December 2024",
+//     amount: "55.000",
+//     name: "Isna",
+//     type: "Transfer",
+//     debit: false,
+//   },
+// ];
 
 const styles = StyleSheet.create({
   balancebox: {
